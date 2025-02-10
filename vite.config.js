@@ -5,6 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig({
   base: 'https://rzeiler.github.io/ConfigurationToClass/',
+  build: {
+    outDir: 'docs',
+    emptyOutDir: true, // also necessary
+  },
   plugins: [
     vue(),
     VitePWA({
