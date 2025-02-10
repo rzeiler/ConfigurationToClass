@@ -146,7 +146,7 @@ createApp({
           if (/^\d/.test(constName)) {
             constName = "_" + constName;
           }
-          classContent += `\tpublic const string ${constName} = "${key}";\n`;
+          classContent += `\tpublic readonly string ${constName} = "${key}";\n`;
         });
 
         // Close the class and namespace brackets.
@@ -242,7 +242,7 @@ createApp({
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("service-worker.js")
+      .register("https://rzeiler.github.io/ConfigurationToClass/service-worker.js")
       .then((registration) => {
         console.log(
           "Service Worker registered with scope:",
