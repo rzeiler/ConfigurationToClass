@@ -1,0 +1,11 @@
+{
+  "name": "xml-key-extractor",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "LIVE": "npx http-server -c-1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
