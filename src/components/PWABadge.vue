@@ -109,16 +109,7 @@ function close() {
 .pwa-toast .message {
   margin-bottom: 8px;
 }
-.pwa-toast .buttons {
-  display: flex;
-}
-.pwa-toast button {
-  border: 1px solid #8885;
-  outline: none;
-  margin-right: 5px;
-  border-radius: 2px;
-  padding: 3px 10px;
-}
+ 
 .pwa-toast button.reload {
   display: block;
 }

@@ -2,7 +2,7 @@
 import { ref } from "vue";
 const processing = ref(false);
 
-import processor from './components/processor.vue'
+import processor from './components/Processor.vue'
 import PWABadge from './components/PWABadge.vue'
 
 const handleEvent = (message) => {
