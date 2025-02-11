@@ -195,7 +195,7 @@ onUnmounted(() => {
 <template>
   <div class="card">
     <button class="me-2" @click="selectXmlFile" title="Select Configuration File" type="button">
-      {{ xmlFileName || "Configuration.xml" }}
+      {{ xmlFileName || "Configuration.config" }}
     </button>
     <!-- XML File selection -->
     <button class="" @click="selectOutputFile" title="Select Class File" type="button">
