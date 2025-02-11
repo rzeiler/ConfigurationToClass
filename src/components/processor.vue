@@ -1,6 +1,9 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, watch, defineEmits } from "vue";
 
+const emit = defineEmits(["processing"]);
+
+const processingInterval = ref(null);
 const title = ref("XML Key Extractor");
 const xmlFileHandle = ref(null);
 const outputFileHandle = ref(null);
@@ -9,6 +12,8 @@ const outputFileName = ref("");
 const messages = ref([]);
 const knownKeys = ref([]);
 const pollingInterval = ref(null);
+
+const processingIntervalLength = 1900;
 
 const opts = {
   suggestedName: "configurations.cs",
@@ -24,6 +29,7 @@ const description = {
   processing: "Processing File...",
   wait: "waiting...",
 };
+
 
 // Helper method to add a log entry with a timestamp.
 const logMessage = (msg) => {
@@ -80,7 +86,7 @@ const extractKeys = (xmlText) => {
     if (!appSettings) return [];
     const addElements = appSettings.getElementsByTagName("add");
     return [...addElements].map((el) => {
-      return { key: el.getAttribute("key"), value: el.getAttribute("value") };
+      return { key: el.getAttribute("key"), value: el.getAttribute("value"), toString: function () { return this.key; } };
     }).filter(Boolean);
   } catch (err) {
     console.error("Error parsing XML:", err);
@@ -126,11 +132,20 @@ const processFile = async () => {
     return;
   }
   try {
+    if (processingInterval.value) clearInterval(processingInterval.value);
+    emit("processing", true);
+
     const file = await xmlFileHandle.value.getFile();
     const xmlText = await file.text();
     const keys = extractKeys(xmlText);
     knownKeys.value = [...keys];
     await writeOutputFile(keys);
+
+
+    processingInterval.value = setTimeout(() => {
+      emit("processing", false);
+    }, processingIntervalLength)
+
     logMessage("Processing complete. Output file written.");
     startPolling();
   } catch (err) {
@@ -149,28 +164,50 @@ const startPolling = () => {
   });
 
   pollingInterval.value = setInterval(async () => {
+    // emit("processing", true);
     try {
       const file = await xmlFileHandle.value.getFile();
       if (lastModifiedTime !== file.lastModified) {
         lastModifiedTime = file.lastModified;
         const xmlText = await file.text();
         const currentKeys = extractKeys(xmlText);
-        const newKeys = currentKeys.filter((key) => !knownKeys.value.includes(key));
-        const deletedKeys = knownKeys.value.filter((key) => !currentKeys.includes(key));
+
+        const newKeys = currentKeys.filter((key) =>
+          !knownKeys.value.some((obj2) => key.key === obj2.key)
+        );
+        const deletedKeys = knownKeys.value.filter((key) =>
+          !currentKeys.some((obj2) => key.key === obj2.key)
+        );
+
+
 
         if (newKeys.length > 0 || deletedKeys.length > 0) {
+
+          if (processingInterval.value) clearInterval(processingInterval.value);
+          emit("processing", true);
+
           await writeOutputFile(currentKeys);
           let status = "";
+
+
           if (newKeys.length > 0) status += `New keys added: ${newKeys.join(", ")}. `;
           if (deletedKeys.length > 0) status += `Keys removed: ${deletedKeys.join(", ")}. `;
           status += "Output file updated.";
           logMessage(status);
           knownKeys.value = [...currentKeys];
+
+          processingInterval.value = setTimeout(() => {
+            emit("processing", false);
+          }, processingIntervalLength)
+
         }
       }
     } catch (err) {
       console.error("Error during polling:", err);
     }
+
+    // 
+
   }, 2000);
 };
 
@@ -184,6 +221,15 @@ watch([xmlFileHandle, outputFileHandle], ([xml, output]) => {
 
 onMounted(() => {
   document.title = "XML Key Extractor";
+
+  if (processingInterval.value) clearInterval(processingInterval.value);
+  emit("processing", true);
+  
+  processingInterval.value = setTimeout(() => {
+            emit("processing", false);
+          }, processingIntervalLength)
+
+
 });
 
 onUnmounted(() => {
@@ -204,14 +250,21 @@ onUnmounted(() => {
 
   </div>
 
-
-  <transition-group name="log" tag="ul">
-    <li v-for="(message, index) in messages" :key="index">{{ message }}</li>
-  </transition-group>
-
+  <div class="box">
+    <transition-group name="log" tag="ul">
+      <li v-for="(message, index) in messages" :key="index">{{ message }}</li>
+    </transition-group>
+  </div>
 </template>
 
 <style scoped>
+.box {
+  box-shadow: 0px 0px 10px 10px inset #fff;
+  position: relative;
+  z-index: 2;
+
+}
+
 .me-2 {
   margin-right: 2rem;
 }
@@ -223,7 +276,7 @@ ul {
 li {
   text-align: left;
   border-left: 1px solid #aaa;
-  padding: 5px 0px 10px 10px;
+  padding: 5px 20px 10px 10px;
 
 }
 
