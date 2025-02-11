@@ -79,7 +79,9 @@ const extractKeys = (xmlText) => {
     const appSettings = xmlDoc.getElementsByTagName("appSettings")[0];
     if (!appSettings) return [];
     const addElements = appSettings.getElementsByTagName("add");
-    return [...addElements].map((el) => el.getAttribute("key")).filter(Boolean);
+    return [...addElements].map((el) => {
+      return { key: el.getAttribute("key"), value: el.getAttribute("value") };
+    }).filter(Boolean);
   } catch (err) {
     console.error("Error parsing XML:", err);
     return [];
@@ -94,14 +96,17 @@ const writeOutputFile = async (keys) => {
       outputFileHandle.value = await window.showSaveFilePicker(opts);
     }
     const writable = await outputFileHandle.value.createWritable();
-    let classContent = `// Auto-generated C# class for AppSettins -Keys\npublic class ConfigurationSetting\n{\n`;
-    keys.forEach((key) => {
-      let constName = key.replace(/\W/g, "_");
+    let classContent = `// Auto-generated C# class for AppSettins -Keys\n\npublic class ConfigurationSetting\n{\n`;
+    keys.forEach((item) => {
+      let constName = item.key.replace(/\W/g, "_");
       if (/^\d/.test(constName)) {
         constName = "_" + constName;
       }
-      // ConfigurationManager.AppSettings[settingKey.Pdflicensekey];
-      classContent += `\tpublic const string ${constName} = ConfigurationManager.AppSettings["${key}"];\n`;
+
+      classContent += `\t/// <summary>\n`;
+      classContent += `\t/// Contains ${item.value}\n`;
+      classContent += `\t/// <summary>\n`;
+      classContent += `\tpublic const string ${constName} = ConfigurationManager.AppSettings["${item.key}"];\n`;
     });
     classContent += `}\n`;
     await writable.write(classContent);
@@ -237,16 +242,16 @@ li::before {
 
 li:last-child {
   color: #8b5bb8;
-  
+
 }
 
 li:last-child::before {
-    width: 6px;
-    height: 6px;
-    background-color: #fff;
-    border: 3px solid #8b5bb8;
-    box-shadow: 0 0 5px 0 rgba(100, 100, 100, .5);
-  }
+  width: 6px;
+  height: 6px;
+  background-color: #fff;
+  border: 3px solid #8b5bb8;
+  box-shadow: 0 0 5px 0 rgba(100, 100, 100, .5);
+}
 
 
 .log-enter-active,

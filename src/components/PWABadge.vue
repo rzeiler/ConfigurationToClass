@@ -99,7 +99,7 @@ function close() {
   margin: 16px;
   padding: 12px;
   border: 1px solid #8885;
-  border-radius: 4px;
+  border-radius: 10px;
   z-index: 1;
   text-align: left;
   box-shadow: 3px 4px 5px 0 #8885;
