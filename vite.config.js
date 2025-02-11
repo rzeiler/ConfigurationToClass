@@ -4,10 +4,13 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  outDir: 'docs',
   base: process.env.NODE_ENV === 'production'
   ? '/ConfigurationToClass/'
   : '/',
+  build: {
+    outDir: 'docs',
+    emptyOutDir: true, // also necessary
+  },
   plugins: [vue(), VitePWA({
     registerType: 'prompt',
     injectRegister: false,
