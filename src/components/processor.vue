@@ -100,7 +100,8 @@ const writeOutputFile = async (keys) => {
       if (/^\d/.test(constName)) {
         constName = "_" + constName;
       }
-      classContent += `\tpublic readonly string ${constName} = "${key}";\n`;
+      // ConfigurationManager.AppSettings[settingKey.Pdflicensekey];
+      classContent += `\tpublic const string ${constName} = ConfigurationManager.AppSettings["${key}"];\n`;
     });
     classContent += `}\n`;
     await writable.write(classContent);

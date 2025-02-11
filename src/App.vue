@@ -1,17 +1,20 @@
 <script setup>
 import processor from './components/processor.vue'
+import PWABadge from './components/PWABadge.vue'
 </script>
 
 <template>
-  <div class="container">
+   <div class="container">
     <div class="logo" title="Processor Rocket">
       &#128640;
     </div>
     <processor />
-   
   </div>
+  <HelloWorld msg="ConfigToClass" />
   Made with <span style="color: #e25555;">&hearts;</span> by Ralf
+  <PWABadge />
 </template>
+
 
 <style scoped>
 .container {
