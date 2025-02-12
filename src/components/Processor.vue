@@ -35,7 +35,8 @@ const description = {
 const logMessage = (msg) => {
   const timestamp = new Date().toLocaleTimeString();
   //messages.value.unshift(`[${timestamp}] ${msg}`);
-  messages.value.push(`[${timestamp}] ${msg}`);
+  //messages.value.push(`[${timestamp}] ${msg}`);
+  messages.value.push({ timestamp: new Date(), message: msg });
 };
 
 // Let the user pick an XML file.
@@ -224,10 +225,10 @@ onMounted(() => {
 
   if (processingInterval.value) clearInterval(processingInterval.value);
   emit("processing", true);
-  
+
   processingInterval.value = setTimeout(() => {
-            emit("processing", false);
-          }, processingIntervalLength)
+    emit("processing", false);
+  }, processingIntervalLength)
 
 
 });
@@ -252,7 +253,7 @@ onUnmounted(() => {
 
   <div class="box">
     <transition-group name="log" tag="ul">
-      <li v-for="(message, index) in messages" :key="index">{{ message }}</li>
+      <li v-for="(item, index) in messages" :key="index"><strong>{{ item.timestamp.toLocaleTimeString() }}</strong> : {{ item.message }}</li>
     </transition-group>
   </div>
 </template>
